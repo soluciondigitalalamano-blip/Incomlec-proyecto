@@ -4,12 +4,12 @@ Estimado/a cliente,
 
 Le informamos que se ha actualizado el siguiente módulo:
 
-1. Informe Semanal de Proyectos
+1. Informe Proyectos Semanal
 
 Puede ingresar a su plataforma para revisar el detalle completo de la
 información actualizada:
 
-https://incomlec-proyecto.pages.dev/
+https://incomlec-proyecto.pages.dev/#resumen
 
 Equipo Operaciones
 Lidato · Su solución digital a la mano

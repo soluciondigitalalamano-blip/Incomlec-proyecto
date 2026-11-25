@@ -219,8 +219,8 @@ intacto y el cliente entra con un solo clic.
 
 Después de enviar, con el `id` que devuelve llama a `mcp__Resend__get-email`
 y comprueba en el HTML enviado que aparezca
-`href="https://incomlec-proyecto.pages.dev/"` sin `google.com/url`. Reporta
-el resultado en una línea.
+`href="https://incomlec-proyecto.pages.dev/#resumen"` sin `google.com/url`.
+Reporta el resultado en una línea.
 
 Si Resend falla, avisa el error y **no reintentes por Gmail**.
 

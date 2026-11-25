@@ -536,22 +536,31 @@ td .sb{font-size:11px}
       Ver .automatizacion/RUNBOOK.md y MAPA_PDF_A_DATA.md.
    ===================================================================== */
 const DATA={
-  corte:'2026-10-14',   // corte de este informe (ISO). TODO el texto de fecha se deriva de aqui.
-  ant:'2026-09-29',     // corte anterior con el que se compara (ISO)
-  /* Secciones cuya pagina del PDF vino DESFASADA: su propia fecha (ISO).
-     Vacio = toda la pagina esta al corte. NUNCA rotules datos viejos con el
-     corte nuevo: deja la seccion sin transcribir y pon aqui su fecha real.
-     Claves validas: resumen · proyectos · bulevar · cuenca · pereira ·
-     cmsabana · titan · jmc            (ver .automatizacion/RUNBOOK.md) */
-  cortes:{},
-  resumen:{ // «Resumen Ejecutivo de Proyectos»
-    actual:{total:45,at:16,riesgo:2,cli:8,inc:17},
-    anterior:{total:41,at:14,riesgo:7,cli:3,inc:17}
+  corte:'2026-11-18',   // corte de este informe (ISO). TODO el texto de fecha se deriva de aqui.
+  ant:'2026-10-14',     // corte anterior con el que se compara (ISO)
+  /* Secciones cuya pagina del PDF vino DESFASADA o NO vino: su propia fecha
+     (ISO). Vacio = toda la pagina esta al corte. NUNCA rotules datos viejos
+     con el corte nuevo. Claves validas: resumen · proyectos · bulevar ·
+     cuenca · pereira · cmsabana · titan · jmc · diverplaza · plazaclaro ·
+     programacion · bl229       (ver .automatizacion/RUNBOOK.md)
+     `bulevar` son las tareas ID+D; `bulevarplan` son las plazas, las
+     descartadas y el cronograma, que pueden venir de cortes distintos. */
+  cortes:{pereira:'2026-10-14',cmsabana:'2026-10-14',titan:'2026-10-14',jmc:'2026-10-14',bulevarplan:'2026-10-14'},
+  /* ⚠ El insumo del 18-nov se contradice: estas tarjetas del resumen
+     ejecutivo dicen 20 a tiempo y 5 en riesgo, mientras que las tablas de
+     cada linea suman 11 y 13. Se publican las dos cifras tal como vienen,
+     por decision del cliente. Ver `discrepancia` mas abajo. */
+  resumen:{ // «Resumen Ejecutivo de Proyectos», pagina 1
+    actual:{total:49,at:20,riesgo:5,cli:6,inc:16},
+    anterior:{total:45,at:16,riesgo:2,cli:8,inc:17}
   },
+  /* Aviso que la pagina muestra cuando el insumo no cuadra consigo mismo.
+     null = sin discrepancia. */
+  discrepancia:'El resumen ejecutivo del informe declara 20 proyectos a tiempo y 5 en riesgo. Las tablas de cada linea, sumadas proyecto a proyecto, dan 11 y 13. El total (49), los fuera de tiempo por cliente (6) y los de Incomelec (16) si coinciden. Ambas cifras se publican tal como vienen en el informe.',
   clasificacion:[ // [nombre, corte, corte anterior]
-    ['Parking',16,14],['Peajes',10,9],['Aeropuertos',8,7],['Control acceso peatonal',5,4],['Control acceso vehicular',4,4],['Compras',2,2],['Mantenimientos',0,1]
+    ['Parking',16,16],['Peajes',10,10],['Aeropuertos',9,8],['Control acceso peatonal',7,5],['Control acceso vehicular',5,4],['Compras',2,2],['Mantenimientos',0,0]
   ],
-  procesos:[['En curso',19,17],['Compras',14,15],['Pend. comercial',10,7],['I+D',2,2]],
+  procesos:[['Compras',19,14],['En curso',17,19],['Pend. comercial',10,10],['I+D',2,2],['Pend. admin',1,0]],
   lineas:{
     parking:{n:'Parking',i:'car'},
     aero:{n:'Aeropuertos',i:'plane'},
@@ -559,59 +568,69 @@ const DATA={
     vehi:{n:'Control de acceso vehicular y peajes',i:'gate'},
     compras:{n:'Compras',i:'cart'}
   },
-  // [línea, CC, proyecto, estado, % cumplimiento, fecha fin, fecha proyectada, observaciones]
+  // [linea, CC, proyecto, estado, % cumplimiento, fecha fin, fecha proyectada, observaciones]
   // estado: at = a tiempo · riesgo = a tiempo pero en riesgo · cli = fuera de tiempo causa cliente · inc = fuera de tiempo causa Incomelec · sin = sin fecha
   proyectos:[
+    ['parking','CC-13465S-26102002','B ÁGORA (Reubicación equipos)','sin',0,null,null,''],
     ['parking','CC-12428','TITAN – Conversión a Spark II','riesgo',0,'2026-10-16',null,''],
-    ['parking','CC-14901','Mayorca: Conversión a Spark II','inc',60,'2026-01-31',null,'Se encuentra pausado hasta estabi…'],
+    ['parking','CC-14901','Mayorca: Conversión a Spark II','inc',60,'2026-01-31',null,'Se encuentra pausado hasta estabilizar spark 2'],
+    ['parking','Tiquet 32612','Excusas Titan: Reenviar: Conmutación entre Carril Esclusa y carril convencional','sin',0,null,null,'En laboratorio'],
     ['parking','CC-13114','Eafit (Barreras adicionales)','cli',40,'2026-05-18','2026-05-18','Ajuste de plumas 19 de agosto'],
-    ['parking','CC-53104','Unisabana (Parking Motos)(OC-128734)(Z-)','riesgo',100,'2026-07-06','2026-07-30','Interfonía'],
     ['parking','CC-13104-(1228)','Universidad Uniagustiniana','inc',100,'2025-12-12','2026-09-30','Reunión avance proyecto'],
-    ['parking','CC-13714','Diverplaza','inc',83,'2026-05-05','2026-09-30','Estabilización'],
-    ['parking','CC-13715','Diverplaza (DiverExpress)','inc',83,'2026-05-05','2026-09-30','Estabilización'],
-    ['parking','CC-133120','Titán – Traslado de carril','riesgo',25,'2026-10-12','2026-10-21','Reunión de inicio'],
-    ['parking','CC-13113 (58105)-10','Alcaldía de Cuenca – 24 de Mayo','cli',14,'2026-04-30','2026-10-29','Instalación'],
-    ['parking','CC-13113 (58105)-6','Alcaldía de Cuenca – El Arenal','cli',14,'2026-04-30','2026-10-29','Instalación'],
-    ['parking','CC-13113 (58105)-7','Alcaldía de Cuenca – 10 de Agosto','cli',14,'2026-04-30','2026-10-29','Instalación'],
-    ['parking','CC-13113 (58105)-8','Alcaldía de Cuenca – 12 de Abril','cli',14,'2026-04-30','2026-10-29','Instalación'],
-    ['parking','CC-13113 (58105)-9','Alcaldía de Cuenca – Terminal terrestre','cli',14,'2026-04-30','2026-10-29','Instalación'],
-    ['parking','CC-13116','COMPENSAR (Calle 26)(OC-29)','inc',13,'2026-08-03','2026-11-05','Anticipo 9/9/2026'],
-    ['parking','CC-13115','COMPENSAR (1 de Mayo)(OC-28)','riesgo',29,'2026-08-17','2026-11-08','Anticipo 9/9/2026'],
-    ['parking','CC-13109','Bulevar Niza','inc',78,'2026-03-18','2026-12-31','Otro Sí'],
-    ['aero','CC-51603','Sala de Migración Barranquilla (6 INMIGRA)','sin',0,null,null,'Revisiones constantes y modificación de pla…'],
-    ['aero','CC-52104 (1509)','Proyecto Biomig Montería','cli',83,'2025-12-10','2026-10-23','Disponibilidad inhouse 19 octubre'],
-    ['aero','CC-52106','Biomig Montería (Gobernación)','cli',75,'2025-12-31','2026-10-23','Disponibilidad inhouse 19 octubre'],
-    ['aero','CC-52121','AENA España (Homologación pasillo Lynx Flow)','at',0,'2026-11-30','2026-11-30','Envío información técnica Equioo'],
-    ['aero','CC-52119','Aerooriente RCH (Pasillos Skypass)','at',0,'2027-01-01','2027-01-01','Revisión precios servidor'],
-    ['aero','CC-52119 ','Aerooriente SMR (Pasillos Skypass y antirretorno)','at',30,'2027-01-01','2027-01-01','Revisión precios servidor / llegada equipos…'],
-    ['aero','CC-52120','AIRPLAN Ampliación Aeropuerto JMC','at',10,'2027-03-12','2027-03-12','Reunión jueves 08'],
-    ['peat','CC-55102','N Universidad EIA (2 Trilane)','riesgo',25,'2026-09-04',null,'No es viable desarrollo'],
-    ['peat','CC-15102','Confacaldas (11 Trilane 2C)','inc',83,'2026-04-30','2027-01-08','Sin cambio de estatus. Pendientes elementos 1635 para completar 3 torniquetes'],
-    ['peat','CC-15105-26022601','N Omnitempus (Firstlane 80-11)(OC-P00115)','riesgo',0,'2026-10-02','2027-01-08','A la espera que el cliente confirme visita técnica'],
+    ['parking','CC-13714','Diverplaza','inc',83,'2026-05-05','2026-09-30','Gopass (6 pendientes)'],
+    ['parking','CC-13715','Diverplaza (DiverExpress)','inc',83,'2026-05-05','2026-09-30','Gopass (6 pendientes)'],
+    ['parking','CC-13113 (58105)-6','Alcaldía de Cuenca – El Arenal','cli',100,'2026-04-30','2026-10-29','3 pendientes'],
+    ['parking','CC-13116','COMPENSAR (Calle 26)(OC-29)','cli',13,'2026-08-03','2026-11-05','Se espera terminar obra civil 22/11/2026'],
+    ['parking','CC-13115','COMPENSAR (1 de Mayo)(OC-28)','cli',29,'2026-08-17','2026-11-08','Anticipo 9/9/2026'],
+    ['parking','tiquet #25637','PDA Titan','riesgo',0,'2026-11-20','2026-11-20',''],
+    ['parking','CC-13119','FixVisualSystems Ambato (Parking)(OC-Contrato)(Z-)','at',0,'2026-12-10','2026-12-10',''],
+    ['parking','CC-13120','Unicentro Girardot (Cajero)(OC-2454)(Z-)','at',0,'2027-01-29','2027-01-29','Llegada de cajero finales de diciembre'],
+    ['parking','CC-53901','Plaza Claro (Renovación)(OC-Contrato)(Z-)','at',0,'2027-02-02','2027-02-02',''],
+    ['parking','CC-13109','Bulevar Niza','inc',78,'2026-03-18','2027-02-21','Llegada parqueadero guiado 01/12/2026-04/12/2026'],
+    ['aero','CC-52126','AEROORIENTE – CUPPS / AODB AMADEUS + Kioscos CUSS Easier – SMR / RCH','sin',0,null,null,''],
+    ['aero','CC-52104 (1509)','Proyecto Biomig Montería','cli',83,'2025-12-10','2026-11-30','Confirmación migración 18/11/2026 (pendiente licencia)'],
+    ['aero','CC-52106','Biomig Montería (Gobernación)','cli',75,'2025-12-31','2026-11-30','Confirmación migración 18/11/2026 (pendiente licencia)'],
+    ['aero','CC-52121','AENA España (Homologación pasillo Lynx Flow)','riesgo',0,'2026-11-30','2026-11-30','Declaración UE de Conformidad, certificados CE, directivas y normas EN/IEC, y ficha técnica actualizada. Está a cargo de Compras (16/10/2026)'],
+    ['aero','CC-52119','Aerooriente RCH (Pasillos Skypass)','at',0,'2027-01-01','2027-01-19','Llegada mitad de diciembre'],
+    ['aero','CC-52119 ','Aerooriente SMR (Pasillos Skypass y antirretorno)','at',30,'2027-01-01','2027-01-19','Llegada mitad de diciembre'],
+    ['aero','CC-52124','Aeropuerto Ernesto Cortissoz (Pasillos Skypass)','at',14,'2027-01-23','2027-02-23','Revisión de pasillos'],
+    ['aero','CC-52125','Ampliación Biomig Aeropuerto Ernesto Cortissoz Barranquilla (fecha 1)','at',14,'2027-01-23','2027-02-23','Revisión de pasillos'],
+    ['aero','CC-52120','AIRPLAN Ampliación Aeropuerto JMC','at',10,'2027-03-12','2027-03-12','Llegada equipos nov'],
     ['peat','CC-15107','G4S (2 Trilane)(OC-76100)(Z-)','at',0,'2026-12-20','2027-01-08',''],
-    ['peat','CC-55103','Jhonson Controls (Slimlane)(OC-47722601234)(Z-)','riesgo',22,'2026-10-10','2027-01-08','Liberan fábrica 12 de diciembre'],
-    ['vehi','CC-16325','utr16325affic (repuestos 3 BL 229)','at',0,'2026-11-20','2026-11-20','Pendiente llegada de mecanismo'],
-    ['vehi','CC-17105','Sotelcom (Bancolombia Niquía)','at',0,'2026-11-19','2026-11-19','Pendiente obra civil cliente'],
-    ['vehi','CC-17106','Sotelcom (Bancolombia Niquía)','at',0,'2026-11-19','2026-11-19','Pendiente obra civil cliente'],
-    ['vehi','CC-16211','INDRA (3 BL)','inc',0,'2026-06-04','2026-11-14','Pendiente llegada de mecanismo'],
-    ['vehi','CC-16214','Sacyr (3 BL-229 TOLL)(OC-6047)(Z-)','inc',0,'2026-09-03','2026-11-14','Pendiente llegada de mecanismo'],
-    ['vehi','CC-56204','Indra México (4 BL-229 Toll)','inc',0,'2026-08-28','2026-11-14','Pendiente llegada de mecanismo'],
-    ['vehi','CC-56205','Thomas (3 BL-229)(OC-1900006331)(Z-)','inc',0,'2026-08-06','2026-11-14','Pendiente llegada de mecanismo'],
-    ['vehi','CC-56207','INDRA México (10 BL)(Proyecto La Venta – Chamapa)(OC-4200672032)','inc',0,'2026-09-14','2026-11-14','Pendiente llegada de mecanismo'],
-    ['vehi','CC-56208','INDRA México (8 BL)(Proyecto La Venta – Chamapa)','inc',0,'2026-09-14','2026-11-14','Pendiente llegada de mecanismo'],
-    ['vehi','CC-56211','F2X (1 BL-229)(OC-424)(Z-)','inc',0,'2026-09-29','2026-11-14','Pendiente llegada de mecanismo'],
-    ['vehi','CC-56212','F2X (6 BL-229)(OC-348)(Z-841)','inc',0,'2026-09-29','2026-11-14','Pendiente llegada de mecanismo'],
+    ['peat','CC-15702','Pacific Center (Control de acceso peatonal)(OC-Contrato)(Z-)','at',0,'2027-01-18','2027-01-18',''],
+    ['peat','CC-55104','Edificio Calle 75 (Slimlane)(OC-0709)(Z-)','at',0,'2027-01-28','2027-01-28',''],
+    ['peat','CC-15105-26022601','N Omnitempus (Firstlane 80-11)(OC-P00115)','riesgo',0,'2026-10-02','2027-01-10','A la espera que el cliente confirme visita técnica'],
+    ['peat','CC-55103','Jhonson Controls (Slimlane)(OC-47722601234)(Z-)','riesgo',33,'2026-10-10','2027-01-08','Liberan fábrica 12 de diciembre'],
+    ['peat','CC-55102','N Universidad EIA (2 Trilane)','riesgo',25,'2026-09-04','2027-01-23','No es viable desarrollo'],
+    ['peat','CC-15102','Confacaldas (11 Trilane 2C)','inc',83,'2026-04-30','2027-01-08','Sin cambio de estatus. Pendientes elementos 1635 para completar 3 torniquetes'],
+    ['vehi','CC-56204','Indra México (4 BL-229 Toll)','inc',0,'2026-08-28','2026-11-28','Pendiente llegada de mecanismo'],
+    ['vehi','CC-16211','INDRA (3 BL)','inc',0,'2026-06-04','2026-11-20','Pendiente llegada de mecanismo'],
+    ['vehi','CC-17105','Sotelcom (Bancolombia Niquía)','riesgo',25,'2026-11-19','2026-11-19','Pendiente obra civil cliente'],
+    ['vehi','CC-17106','Sotelcom (Bancolombia Niquía)','riesgo',25,'2026-11-19','2026-11-19','Pendiente obra civil cliente'],
+    ['vehi','CC-17206','CYA (5 BL227-229 Coca Cola)','riesgo',0,'2026-11-13','2026-11-19',''],
+    ['vehi','CC-16325','utr16325affic (repuestos 3 BL 229)','riesgo',0,'2026-11-20','2026-11-18','Pendiente llegada de mecanismo'],
+    ['vehi','CC-56205','Thomas (3 BL-229)(OC-1900006331)(Z-)','inc',0,'2026-08-06','2026-11-18','Pendiente llegada de mecanismo'],
+    ['vehi','CC-17107','Sotelcom (BL-15 Poblado)(OC-975)(Z-)','riesgo',0,'2026-11-16','2026-11-16',''],
+    ['vehi','CC-17207','Grupo Verytel (2 BL229 FAC)','riesgo',0,'2026-11-13','2026-11-13',''],
+    ['vehi','CC-56211','F2X (1 BL-229)(OC-424)(Z-)','inc',0,'2026-09-29','2026-11-13','Pendiente llegada de mecanismo'],
+    ['vehi','CC-56212','F2X (6 BL-229)(OC-348)(Z-841)','inc',0,'2026-09-29','2026-11-13','Pendiente llegada de mecanismo'],
+    ['vehi','CC-56209','(6 BL) Indra México (Refaccionamiento Ideal)(OC-4200672842)(Z-)','inc',0,'2026-09-14','2026-11-12','Pendiente llegada de mecanismo'],
+    ['vehi','CC-56207','INDRA México (10 BL)(Proyecto La Venta – Chamapa)(OC-4200672032)','inc',0,'2026-09-14','2026-11-11','Pendiente llegada de mecanismo'],
+    ['vehi','CC-56208','INDRA México (8 BL)(Proyecto La Venta – Chamapa)(OC-4200672033)','inc',0,'2026-09-14','2026-11-10','Pendiente llegada de mecanismo'],
+    ['vehi','CC-16214','Sacyr (3 BL-229 Toll)(OC-6047)(Z-)','inc',0,'2026-09-03','2026-11-06','Pendiente llegada de mecanismo'],
     ['compras','CC-13105','Reacondicionamiento retoma equipos Barranquilla','inc',0,'2026-02-15','2026-03-20','Diagnóstico'],
     ['compras','—','Instalación lámparas Casa 3','riesgo',0,'2026-02-20',null,'Pendiente disponibilidad']
   ],
   sinProyectos:['Transporte masivo','Soporte y mantenimientos'],
+  /* Nota al pie de la pagina de Control de acceso peatonal */
+  notaPeat:'Pendiente 4 tarjetas 1635 + 5 soportes',
   /* ---------- Seguimiento de clientes Parking ---------- */
   bulevar:{
-    tareas:[ // [elemento, descripción, categoría, progreso, prioridad, inicio, vencimiento]
-      ['CC-13109-Bulevar','Backup','Servidor','En curso','Alto','30 de mayo','08 de septiembre'],
-      ['CC-13109-Bulevar','Tiempo de pantallas disuasivas','Pantalla','No iniciado','Alto','30 de mayo','08 de septiembre'],
-      ['CC-13109-Bulevar','Conciliación parqueadero cierre septiembre','Spark','Completado','Alto','',''],
-      ['CC-13109 - Bulevar','Cuando el abonado renueva, está quedando con la fecha de creación inicial y no con la fecha de pago. Ej: si se venció el 5 y se hace pago el 15 está tomando la nueva mensualidad desde el 5 y no desde el 15 que es cuando se realiza el pago.','Spark 2','En curso','Crítico','Ayer','Hoy']
+    tareas:[ // [elemento, descripcion, categoria, progreso, prioridad, inicio, vencimiento]
+      ['CC-13109-Bulevar','Backup. Se puede hacer backup en la versión 2.40','Servidor','En curso','','',''],
+      ['CC-13109-Bulevar','Cuando el abonado renueva, está quedando con la fecha de creación inicial y no con la fecha de pago. Ej: si se venció el 5 y se hace pago el 15 está tomando la nueva mensualidad desde el 5 y no desde el 15 que es cuando se realiza el pago. Ticket 872 mantis','Spark 2','En curso','','',''],
+      ['CC-13109-Bulevar','Integración con datáfonos – Redeban','Spark 2','En curso','','',''],
+      ['CC-13109-Bulevar','Integración con GoPass','Spark 2','No iniciado','','','']
     ],
     plazas:{sot1:210,sot2:522,total:732,dif:-17,totSot1:210,totSot2:505,totales:715,inicial:804,servidumbre:772,notas:['Varillas y chazos de forma local','Varilla rosca M8']},
     descartadas:{cols:['Sin techo 1','Sin techo 2','Rejillas 1','Rejillas 2','Outdoor 1','Outdoor 2','Baja altura','Total'],
@@ -649,15 +668,80 @@ const DATA={
       ['7.1','Entrega documentación','2027-02-07','2027-02-21',0,1]
     ]
   },
-  cuenca:[ // ID+D-Proyectos_Pendientes: [descripción, categoría, progreso, prioridad, inicio, vencimiento]
-    ['Impresión de factura: el cajero no está imprimiendo la factura después del pago.','Cajero','En curso','Alto','28 de agosto','30 de septiembre'],
-    ['Actualización facturación electrónica: no permite colocar el número de teléfono y tampoco permite seleccionar el tipo de documento.','Cajero','En curso','Alto','28 de agosto','30 de septiembre'],
-    ['Calibración de monedero: el monedero solo fue calibrado con un tipo de moneda de dólar (amarilla); al ingresar el otro tipo de dólar el sistema lo toma pero los vueltos los regresa mal.','Cajero','No iniciado','Alto','28 de agosto','30 de septiembre'],
-    ['Fallo en descargue de hoppers: al sacar la cantidad máxima de monedas, el sistema se ancla en que tiene 74 monedas aunque no haya nada en los hoppers.','Cajero','No iniciado','Alto','28 de agosto','30 de septiembre'],
-    ['El cajero regresa mal los vueltos: se realizó una prueba donde se pagó $0,25 con un billete de $10 y regresó $14.','Cajero','No iniciado','Crítico','',''],
-    ['Actualización de tarifa Taxi Taco.','Tarifas','No iniciado','Alto','',''],
-    ['Revisión de tarifas del terminal terrestre.','Tarifas','No iniciado','Alto','','']
+  /* ID+D – Proyectos pendientes · CC-13113 Alcaldia de Cuenca */
+  cuenca:[ // [descripcion, categoria, progreso, prioridad, inicio, vencimiento]
+    ['Actualización facturación electrónica: no permite colocar el número de teléfono y tampoco permite seleccionar el tipo de documento. Pendiente RUC (cantidad de datos en búsqueda).','Cajero','En curso','Alto','',''],
+    ['Actualización de tarifa Taxi Taco (tarjeta). Pendiente probar – Felipe.','Tarifas','En curso','Alto','',''],
+    ['Arreglar los valores de la tirilla de pago del cajero, que no están coincidiendo (formato de tirilla). Disponible en la versión 2.41.0 del 01/11/2026. #997 · #937','Cajero','En curso','Alto','','']
   ],
+  /* ID+D – Proyectos pendientes · CC-13714 y 13715 Diverplaza y DiverExpress */
+  diverplaza:[ // [descripcion, categoria, progreso, prioridad, inicio, vencimiento]
+    ['Se puede poner la del Éxito. Autogestión de descuentos Éxito y Falabella. La tirilla del Éxito cambia el dígito único en cada caja.','Cajero','En curso','Alto','21 de septiembre','16 de octubre'],
+    ['El abonado que solo tiene registrado el ID de la tarjeta en el SPARK2, cuando le crea la estancia le asocia la placa, y cuando va a salir con la misma tarjeta pero con placa diferente no le permite la salida. De la misma manera ocurre con los de rotación. Nuevo requerimiento: entrada de lectura con lectura de placas relacionado a la tarjeta, y salida obligatoria con tarjeta y validando placa.','Spark','En curso','Alto','20 de octubre','26 de octubre'],
+    ['No está funcionando el botón de Bloqueo Abierto y Bloqueo Cerrado, que está en el botón equipos, en Entradas y Salidas. Se requiere para contingencia que la talanquera quede bloqueada arriba para salida masiva de vehículos.','Spark 2','No iniciado','Baja','30 de octubre','06 de noviembre'],
+    ['Se requiere que el sistema permita anexar el servicio del pago de tarjeta al nuevo abono, ya que cuando se crea el abono este se crea con fecha vencida, y para poder añadir el servicio de pérdida de tarjeta el vehículo tiene que estar dentro del parqueadero. Si se crea una estancia se va a crear como rotación.','Spark','No iniciado','Media','Hace 6 días','Mañana'],
+    ['Instructivo para lectura de tirillas de cajeros. Elaborar y entregar un instructivo técnico que permita interpretar correctamente las tirillas generadas por los cajeros durante el proceso de arqueo. El documento deberá identificar y explicar claramente cada concepto, valor, subtotal y total reflejado en la tirilla, así como su relación con la información registrada en el sistema y utilizada para la conciliación del recaudo.','Cajero','No iniciado','Media','','']
+  ],
+  /* Matriz de entregables – Contrato Plaza Claro (Comcel S.A. / INCOMELEC) */
+  plazaClaro:{
+    fuentes:'Anexo 6. Alcance Equipos de control acceso y parking Plaza Claro; Anexo 4. Acuerdo de Niveles de Servicio (SLA) Software Spark 2.',
+    // [categoria, total, pendiente, en curso, entregado, aprobado, no aplica]
+    categorias:[['Mantenimiento',20,20,0,0,0,0],['Software',27,27,0,0,0,0],['Físicos',18,18,0,0,0,0],['Transversales',14,14,0,0,0,0]],
+    // [proceso, secuencia de entregables, riesgo / penalizacion asociada, resaltado]
+    cadenas:[
+      ['Ciclo preventivo → liquidación','T-01 → M-01 → M-04 → M-06 → M-16 → T-12','Desc. #3 (cronograma) y #8 (3 % por informe tardío)',false],
+      ['Ciclo correctivo','M-07 / M-09 → M-10 → F-01 → M-08 → M-14 → F-07 → F-','Desc. #6 (repuestos); penalización ANS por nivel',false],
+      ['Reposición de equipos','M-12 → M-10 → F-03 → F-09 → F-11 / F-12','Desc. #10 (garantía)',false],
+      ['Migración SPARK 2','S-02 → S-03 → S-01 → S-04…S-08 → S-21 / S-22','SLA independientes Anexo 4',true],
+      ['Funcionalidades e integraciones','S-09 / S-10 → S-18 → S-11 → S-14','Sin costo adicional (§1.5) – requiere acotar alcance',true],
+      ['Información y auditoría','S-25 → S-26 → T-11','Falta grave: suspensión de pagos / terminación',true],
+      ['Documentación técnica física','F-13 → F-12 → F-11 → M-05 → M-17','Entrega máx. 7 días calendario',false],
+      ['Gestión de ANS','T-07 → S-17 → M-19 → T-14','EET y GSU > 95 %; N1 10 %, N2 5 %, N3 3 %',false]
+    ],
+    nota:'Los roles responsables son sugeridos según la estructura del §3.1 del Anexo 6; las observaciones en rojo recogen comentarios y aclaraciones registrados en el documento.',
+    observacion:'Director de negocio al otro por parte del cliente.'
+  },
+  /* Diagrama de Gantt – Programacion de proyectos (pagina de Control de acceso peatonal) */
+  programacion:{
+    desde:'2026-12-01', hasta:'2027-02-22',
+    // [proyecto, inicio ISO, fin ISO]   null = el export no mostro la fecha
+    filas:[
+      ['CC-13119-FixVisualSystems Ambato (Parking)(OC-Contrato)(Z-)','2026-12-01','2026-12-15'],
+      ['CC-55103-Jhonson Controls (Slimlane)(OC-47722601234)(Z-)','2027-01-01','2027-01-06'],
+      ['CC-13109-Bulevar Niza – Guiado','2027-01-03','2027-01-23'],
+      ['CC-52119-Aerooriente SMR (Pasillos Skypass y antirretorno)','2027-01-04','2027-01-14'],
+      ['CC-15105-26022601 N Omnitempus (Firstlane 80-11)(OC-P00115)','2027-01-06','2027-01-10'],
+      ['CC-52120-AIRPLAN Ampliación Aeropuerto JMC','2027-01-10','2027-01-15'],
+      ['CC-15702-Pacific Center (Control de acceso peatonal)(OC-Contrato)(Z-)','2027-01-13','2027-01-18'],
+      ['CC-52119-Aerooriente RCH (Pasillos Skypass)','2027-01-14','2027-01-19'],
+      ['CC-13120-Unicentro Girardot (Cajero)(OC-2454)(Z-)','2027-01-15','2027-01-30'],
+      ['CC-55104-Edificio Calle 75 (Slimlane)(OC-0709)(Z-)','2027-01-18','2027-01-23'],
+      ['CC-52124-Aeropuerto Ernesto Cortissoz (Pasillos Skypass)','2027-02-19','2027-02-22'],
+      ['CC-52125-Ampliación Biomig Aeropuerto Ernesto Cortissoz Barranquilla (fecha 1)','2027-02-19','2027-02-22'],
+      ['CC-15107-G4S (2 Trilane)(OC-76100)(Z-)',null,null]
+    ]
+  },
+  /* Barreras BL229 · C20 y avance del Dia 2 */
+  bl229:{
+    // [prioridad, nombre del C20, cantidad, observaciones, solucion, resuelto]
+    filas:[
+      ['1','CC-16214-Sacyr (3 BL-229 Toll)(OC-6047)(Z-)',3,'Pluma Protecta de 3.5','SOLUCION 1',true],
+      ['2','CC-56208- INDRA México (8 BL)(Proyecto La Venta – Chamapa)(OC-4200672033)',5,'pluma de 4 mts','SOLUCION 1',false],
+      ['3','CC-56207-INDRA México (10 BL)(Proyecto La Venta – Chamapa)(OC-4200672032)',10,'pluma de 3.5 mts','SOLUCION 1',false],
+      ['4','CC-56209- (6 BL) INDRA México (Refaccionamiento Ideal)(OC-4200672842)(Z-)',6,'pluma de 4 mts','SOLUCION 1',false],
+      ['5','CC-56211-F2X (1 BL-229)(OC-424)(Z-)',1,'No especifica','SOLUCION 1',false],
+      ['6','CC-56212-F2X (6 BL-229)(OC-348)(Z-841)',6,'No especifica','SOLUCION 1',false],
+      ['7','CC-56205-Thomas (3 BL-229)(OC-1900006331)(Z-)',3,'pluma de 3.5 mts','SOLUCION 1',false],
+      ['8','CC-16325-utr16325affic (repuestos 3 BL 229)',3,'pluma de 3.5 mts + 6 plumas de 6 mtrs','SOLUCION 1',false],
+      ['9','CC-17206-CYA (5 BL227-229 Coca Cola)',3,'Pluma de 6 mts','SOLUCION 1',false],
+      ['10','CC-17207-Grupo Verytel (2 BL229 FAC)',2,'pluma de 4 mts','SOLUCION 1',false],
+      ['12','CC-16211-INDRA (3 BL)',3,'Pluma redonda de 5 y 6 mtrs','SOLUCION 1',false],
+      ['CANADA','CC-56204-Indra México (4 BL-229 Toll)',4,'','SOLUCION 1',null]
+    ],
+    totalDeclarado:49,
+    // [n.º, item, fecha ISO, cantidad]
+    dia2:[[1,'Mecanismos entregados','2026-11-18',30],[2,'Barreras ensambladas','2026-11-18',24],[3,'Barreras en proceso','2026-11-18',5],[4,'Check list','2026-11-18',3],[5,'Pruebas realizadas','2026-11-18',3],[6,'N.º de técnicos','2026-11-18',5]]
+  },
   pereira:[ // Sociedad de Mejoras de Pereira — novedades reportadas
     ['Cámara de salida','Presenta fallas en la lectura de placas en excelente estado (confunde las letras Q y O con la D). Esto obliga a que el funcionario realice la salida manual; además, el sistema no entiende que al dar salida manual debería finalizar la estancia automáticamente, y hay que hacer un proceso adicional para finalizar cada estancia que salió de forma manual.'],
     ['Plazas máximas abonados','Las rentadoras de vehículos exceden la capacidad de plazas autorizadas; el sistema permite el acceso, pero a la salida se debe hacer un proceso manual para retirar el vehículo y finalizar la estancia. El sistema no permite conocer cuántas plazas excedió cada rentadora; soporte indica que no hay un informe con esta información. Es un punto fundamental para la facturación mensual.'],
@@ -666,12 +750,9 @@ const DATA={
     ['Configuración de tarjetas de mensualidad','Se requiere la capacitación y puesta en funcionamiento de las tarjetas para mensualidades de bicicleta, moto eléctrica o vehículos que no son aptos para lectura de placa.'],
     ['Renovaciones','Desde hace 2 meses hay novedad con las renovaciones de abonados: pasado un mes, si la mensualidad tiene un día de vencimiento no permite la renovación y se debe crear una nueva mensualidad, generando abonos duplicados. Se ha reportado en varias ocasiones sin respuesta acorde.'],
     ['Otros','Preocupa la respuesta de soporte: la mayoría de los casos toman más de una semana para respuesta o intervención; desde julio se reporta la novedad de la cámara de salida. El cliente indica que no existe un buen servicio de soporte.']
-  ],
-  cmSabana:[['Única tarifa, cambio de tarifa de motos en POS (debe tocar los dos loops)',false],['Sin lectura de placa de motos',false],['Necesidad de dos cámaras de lectura de carros por carril',false],['No se recomienda realizar obra civil por maniobrabilidad (columna)',true]],
-  titan:{ // RE: TITAN: Viabilidad Spark2 — [tipo, desde, hasta, modelo, tarjeta]
+  ],  cmSabana:[['Única tarifa, cambio de tarifa de motos en POS (debe tocar los dos loops)',false],['Sin lectura de placa de motos',false],['Necesidad de dos cámaras de lectura de carros por carril',false],['No se recomienda realizar obra civil por maniobrabilidad (columna)',true]],  titan:{ // RE: TITAN: Viabilidad Spark2 — [tipo, desde, hasta, modelo, tarjeta]
     grupos:[['Cajero',1,14,'CAJERO MILENIO PR','UDOO'],['Entrada',1,8,'POSTE MILENIO ENTRADA MT','URVE'],['Entrada',9,10,'POSTE MILENIO GP','UDOO'],['Salida',1,8,'POSTE MILENIO ENTRADA MT','URVE'],['Salida',9,10,'POSTE MILENIO GP','UDOO']]
-  },
-  jmc:{ // Aeropuerto JMC – Medellín (ampliación EMIGRA / IMIGRA)
+  },  jmc:{ // Aeropuerto JMC – Medellín (ampliación EMIGRA / IMIGRA)
     hitos:[['Coger pasillos de inventario',null,true],['Saliendo de fábrica','2026-10-24',false],['Incomelec: aéreo','2026-11-05',false],['Transformado','2026-11-13',false]],
     nota:'Ampliación de pasillos en EMIGRA e IMIGRA (actuales + ampliación + actual reubicado). Soporte pantalla Skylane V10 Biomig, cold rolled, pintura electrostática negra microtexturizada.'
   }
@@ -720,6 +801,8 @@ const corteDe=sec=>CORTES[sec]||DATA.corte;
 /* Sufijo visible cuando una seccion NO esta al corte general */
 const sello=sec=>CORTES[sec]&&CORTES[sec]!==DATA.corte?` · ⚠ datos al ${fd(CORTES[sec])}, no al corte`:'';
 const SECS_VIEJAS=Object.keys(CORTES).filter(k=>CORTES[k]&&CORTES[k]!==DATA.corte);
+const prog=v=>v?`<span class="pill ${v==='Completado'?'p-good':v==='En curso'?'p-neu':v==='Bloqueado'?'p-bad':'p-warn'}">${esc(v)}</span>`:'<span class="muted">—</span>';
+const prioridad=v=>v?`<span class="pill ${v==='Crítico'?'p-bad':v==='Alto'?'p-warn':'p-neu'}">${esc(v)}</span>`:'<span class="muted">—</span>';
 const estTxt=st=>ST[st].l.toLowerCase().replace(' · ',' por ');   // «fuera de tiempo por causa cliente»
 const procTxt=l=>l.replace(/^en\s+/i,'').toLowerCase();           // «En curso» -> «curso»
 const vsAnt=d=>d===0?`= vs ${ANT_DM}`:`${sgn(d)} vs ${ANT_DM}`;
@@ -829,6 +912,10 @@ const GO={
   titan(i){const g=DATA.titan.grupos[+i];const n=g[2]-g[1]+1;openInspector({kind:'Titán · viabilidad Spark2',title:`${g[0]} ${g[1]}–${g[2]}`,sub:`${g[3]} · tarjeta ${g[4]}`,key:'ti-'+i,
     minis:[['Equipos',nf(n)],['Modelo',g[3]],['Tarjeta',g[4]]],
     sections:[{t:'Equipos del grupo',h:tbl([['Tipo'],['N.º',1],['Identificación'],['Modelo'],['Tarjeta']],Array.from({length:n},(_,j)=>({c:[g[0],g[1]+j,`${g[0]} ${g[1]+j}`,g[3],g[4]]})))}]});},
+  prog(){closeInspector();go('programacion');},
+  diver(i){const t=DATA.diverplaza[+i];openInspector({kind:'Diverplaza · pendiente',title:t[0].split('.')[0],sub:'ID+D – Proyectos pendientes · CC-13714 y CC-13715',key:'dv-'+i,pill:prioridad(t[3]),
+    sections:[{h:kv([['Elemento de trabajo','CC-13714 y CC-13715 · Diverplaza y DiverExpress'],['Descripción',esc(t[0])],['Categoría',t[1]],['Progreso',t[2]],['Prioridad',t[3]||'—'],['Fecha de inicio',t[4]||'—'],['Fecha de vencimiento',t[5]||'—']])},
+      {t:'Proyectos de Diverplaza',h:projTbl(P.filter(x=>/^CC-1371[45]/.test(x.cc)))}]});},
   equipos(t){const gs=DATA.titan.grupos.filter(g=>t==='all'||g[0]===t||g[4]===t);const rows=[];gs.forEach(g=>{for(let n=g[1];n<=g[2];n++)rows.push({c:[g[0],n,`${g[0]} ${n}`,g[3],g[4]]});});
     openInspector({kind:'Titán · viabilidad Spark2',title:t==='all'?'Inventario de equipos':(t==='UDOO'||t==='URVE'?'Tarjeta '+t:t+'s'),sub:'RE: TITAN: Viabilidad Spark2',key:'eq-'+t,minis:[['Equipos',nf(rows.length)]],
       sections:[{h:tbl([['Tipo'],['N.º',1],['Identificación'],['Modelo'],['Tarjeta']],rows,['Total','',nf(rows.length)+' equipos','',''])}]});}
@@ -850,7 +937,12 @@ const mov=(a,b,sube='subió',baja='bajó')=>a===b?`se mantuvo en ${nf(a)}`:`${ve
 const cuencaCrit=DATA.cuenca.filter(t=>t[3]==='Crítico');
 const cuencaVenc=[...new Set(DATA.cuenca.map(t=>t[5]).filter(Boolean))];
 const mecFechas=[...new Set(mecanismo.map(p=>p.proy).filter(Boolean))].sort();
-const mecCli=(()=>{const m=new Map();mecanismo.forEach(p=>{const n=p.n.split('(')[0].trim();const k=n.toLowerCase();if(!m.has(k))m.set(k,n);});return [...m.values()];})();
+/* Una lista de ocho fechas no se lee: a partir de tres, se da el rango. */
+const rango=f=>!f.length?'':f.length===1?fd(f[0]):f.length<=2?lista(f.map(fd)):`entre el ${dm(f[0])} y el ${fd(f[f.length-1])}`;
+/* Lo mismo con listas largas de proyectos. */
+const primeros=(a,n=6)=>a.length<=n?a.join(' · '):a.slice(0,n).join(' · ')+` · y ${a.length-n} más`;
+const cliDe=n=>{const t=n.replace(/^\([^)]*\)\s*/,'').split('(')[0].trim();return t||n.split('(').filter(Boolean)[0].replace(/\)$/,'').trim();};
+const mecCli=(()=>{const m=new Map();mecanismo.forEach(p=>{const n=cliDe(p.n);if(!n)return;const k=n.toLowerCase();if(!m.has(k))m.set(k,n);});return [...m.values()];})();
 const BCR=DATA.bulevar.cronograma, B_lv0=BCR.filter(r=>r[5]===0);
 const B_curso=B_lv0.find(r=>r[4]>0&&r[4]<100), B_sig=B_lv0.find(r=>r[4]===0);
 const B_inst=B_lv0.find(r=>/instalaci/i.test(r[1]));
@@ -862,13 +954,14 @@ const ALERTS=[
     d:`${A_.inc===B_.inc?`Igual que el ${ANT_DM}`:`${verbo(A_.inc-B_.inc)} desde ${nf(B_.inc)} el ${ANT_DM}`}; es el ${pctTot(A_.inc)} del portafolio.`,
     lvl:'bad',go:()=>GO.resumen('inc')},
   mecanismo.length>0&&{t:`${plural(mecanismo.length,'proyecto','proyectos')} de peajes ${mecanismo.length===1?'espera':'esperan'} la llegada del mecanismo`,
-    d:`${lista(mecCli)}: fecha proyectada ${lista(mecFechas.map(fd))}.`,lvl:'bad',go:()=>GO.linea('vehi')},
+    d:`${lista(mecCli)}: fecha proyectada ${rango(mecFechas)}.`,lvl:'bad',go:()=>GO.linea('vehi')},
   projVencida.length>0&&{t:`${plural(projVencida.length,'proyecto','proyectos')} con la fecha proyectada ya vencida`,
-    d:projVencida.map(p=>p.n).join(' · '),lvl:'warn',
+    d:primeros(projVencida.map(p=>p.n)),lvl:'warn',
     go:()=>openInspector({kind:'Fechas proyectadas',title:`Fecha proyectada vencida al ${CORTE_DM}`,sub:'Proyectos no "a tiempo" cuya fecha proyectada ya pasó',key:'venc',sections:[{h:projTbl(projVencida)}]})},
   DATA.cuenca.length>0&&{t:`Alcaldía de Cuenca: ${plural(DATA.cuenca.length,'pendiente','pendientes')} en ${lista([...new Set(DATA.cuenca.map(t=>t[1].toLowerCase()))])}`,
-    d:[cuencaCrit.length?`${plural(cuencaCrit.length,'crítico','críticos')} (${cuencaCrit.map(t=>t[0].split(':')[0].toLowerCase()).join('; ')})`:'',
-       cuencaVenc.length?`vencimiento ${lista(cuencaVenc)}`:''].filter(Boolean).join(' y ')+'.',
+    d:([cuencaCrit.length?`${plural(cuencaCrit.length,'crítico','críticos')} (${cuencaCrit.map(t=>t[0].split(':')[0].toLowerCase()).join('; ')})`:'',
+       cuencaVenc.length?`vencimiento ${lista(cuencaVenc)}`:''].filter(Boolean).join(' y ')
+       ||Object.entries(DATA.cuenca.reduce((a,t)=>(a[t[2]]=(a[t[2]]||0)+1,a),{})).map(([k,v])=>`${nf(v)} ${k.toLowerCase()}`).join(' · '))+'.',
     lvl:'warn',go:()=>GO.seg('cuenca')},
   DATA.pereira.length>0&&{t:`Sociedad de Mejoras de Pereira reporta ${plural(DATA.pereira.length,'novedad','novedades')}`,
     d:DATA.pereira.slice(0,3).map(t=>t[0]).join(', ')+(DATA.pereira.length>3?' y otras.':'.'),lvl:'warn',go:()=>GO.seg('pereira')}
@@ -888,7 +981,7 @@ const INSIGHTS=[
       B_inst?`instalación del ${dm(B_inst[2])} al ${dm(B_inst[3])}`:'',
       B_fin?`entrega funcional el ${fd(B_fin)}`:''].filter(Boolean).join('; ')+'.',
    go:()=>GO.seg('bulevar')}
-].filter(Boolean);
+].filter(Boolean).map(x=>x&&/Bulevar/.test(x.t)&&sello('bulevarplan')?{...x,d:x.d+` (datos del ${fd(CORTES.bulevarplan)}, no del corte)`}:x);
 
 /* =====================================================================
    5. VISTAS
@@ -901,7 +994,8 @@ const VIEWS=[
   {id:'aero',l:'Aeropuertos',i:'plane',n:byLin('aero').length},
   {id:'peat',l:'Acceso peatonal',i:'walk',n:byLin('peat').length},
   {id:'vehi',l:'Acceso vehicular y peajes',i:'gate',n:byLin('vehi').length},
-  {id:'compras',l:'Compras',i:'cart',n:byLin('compras').length}
+  {id:'compras',l:'Compras',i:'cart',n:byLin('compras').length},
+  {id:'programacion',l:'Programación',i:'calendar',n:(DATA.programacion&&DATA.programacion.filas.length)||0}
 ];
 const card=(cls,inner,attrs='')=>`<article class="card ${cls}" ${attrs}>${inner}</article>`;
 const ctitle=(t,p,open)=>`<div class="ctitle"><div><h2>${t}</h2>${p?`<p>${p}</p>`:''}</div>${open?openBtn(t):''}</div>`;
@@ -931,6 +1025,7 @@ function renderResumen(el){const R=DATA.resumen,A=R.actual,B=R.anterior;const si
       `)}
     ${card('c7',ctitle('Estado por línea de negocio','Proyectos de cada tabla de línea por estado de entrega · clic en una celda')+matrix())}
     ${card('c5',ctitle('Próximas fechas proyectadas',`Compromisos de los próximos ${VENTANA} días desde el corte · agrupados por fecha · clic para el detalle`)+`<div class="hitos">${proxG.map((g,gi)=>{const d=dt(g.f),one=g.list.length===1,p=g.list[0];const sts=[...new Set(g.list.map(x=>x.st))];return `<div class="hito" data-pg="${gi}"><div class="hd8">${d.getDate()} ${MES[d.getMonth()]}<small>${relTxt(g.f)}</small></div><span class="dot2" style="background:${ST[sts[0]].c}"></span><div><b>${one?esc(p.n):g.list.length+' proyectos · '+esc(g.tit)}</b><span>${one?esc(p.cc)+' · '+linN(p.lin):esc(g.sub)}</span></div>${sts.map(sb).join(' ')}</div>`;}).join('')}</div>`)}
+    ${DATA.discrepancia?card('c12',`<div class="alert w big"><div class="ic" style="width:18px">${ic('alert')}</div><div><b>El informe de origen no cuadra consigo mismo</b><span>${esc(DATA.discrepancia)}</span></div></div>`):''}
     ${SECS_VIEJAS.length?card('c12',`<div class="alert big"><div class="ic" style="width:18px">${ic('alert')}</div><div><b>El insumo vino parcialmente desfasado</b><span>${SECS_VIEJAS.map(k=>`<b>${k}</b>: datos al ${fd(CORTES[k])}`).join(' · ')}. Esas secciones conservan los valores publicados anteriormente y NO corresponden al corte del ${CORTE_TXT}.</span></div></div>`):''}
     ${card('c12 flatnote',`<div class="pnote">${ic('info')}<span>${DATA.sinProyectos.join(' y ')}: sin proyectos registrados en el informe de esta semana.</span></div>`)}
   </div>`;
@@ -986,7 +1081,7 @@ function renderTodos(el){
 /* ---------- LÍNEA ---------- */
 function renderLinea(el,k){const list=byLin(k);const cS=s=>cnt(list,s);const avg=list.length?sum(list.map(p=>p.pct))/list.length:0;
   const late=list.filter(p=>p.fin&&dias(p.fin)<0&&p.st!=='at');
-  const extra=k==='aero'?jmcCard():'';
+  const extra=k==='aero'?jmcCard():k==='vehi'&&DATA.bl229?bl229Card():'';
   el.innerHTML=`<div class="grid">
     <div class="k5">
       ${kpi('linea',k,'hero',DATA.lineas[k].i,'Total proyectos',list.length,`Avance promedio ${pc(avg,0)}${cS('sin')?` · ${cS('sin')} sin fecha`:''}`)}
@@ -1001,6 +1096,26 @@ function renderLinea(el,k){const list=byLin(k);const cS=s=>cnt(list,s);const avg
   $$('[data-p]',el).forEach(b=>act(b,()=>GO.proyecto(b.dataset.p)));
   $$('[data-hito]',el).forEach(b=>act(b,()=>GO.proyecto(P.find(p=>p.cc==='CC-52120').i)));
   wireGo(el);}
+function plazaClaroCard(){const C=DATA.plazaClaro;const T=C.categorias.reduce((a,r)=>r.map((v,i)=>i?a[i]+v:'TOTAL'),['TOTAL',0,0,0,0,0,0]);
+  const avance=t=>t[1]?((t[4]+t[5])/t[1]*100):0;
+  return card('c12',`<div id="seg-plazaclaro"></div>`+ctitle(`Contrato Plaza Claro · ${nf(T[1])} entregables, ${pc(avance(T),1)} de avance`,`Matriz de entregables · Comcel S.A. / INCOMELEC${sello('plazaclaro')}`)+
+    `<p class="note" style="margin:0 0 12px">${esc(C.fuentes)}</p>`+
+    tbl([['Categoría'],['Total',1],['Pendiente',1],['En curso',1],['Entregado',1],['Aprobado',1],['No aplica',1],['% avance',1]],
+      C.categorias.map(r=>({c:[r[0],nf(r[1]),nf(r[2]),nf(r[3]),nf(r[4]),nf(r[5]),nf(r[6]),pc(avance(r),1)]})),
+      ['<b>Total</b>',`<b>${nf(T[1])}</b>`,nf(T[2]),nf(T[3]),nf(T[4]),nf(T[5]),nf(T[6]),`<b>${pc(avance(T),1)}</b>`])+
+    `<h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:18px 0 8px">Cadenas de relación clave entre entregables</h3>`+
+    tbl([['Proceso'],['Secuencia de entregables'],['Riesgo o penalización asociada']],
+      C.cadenas.map(r=>({c:[`<b${r[3]?' style="color:var(--bad)"':''}>${esc(r[0])}</b>`,`<span class="tnum">${esc(r[1])}</span>`,esc(r[2])]})))+
+    `<p class="note" style="margin:12px 0 0">${esc(C.nota)}</p><p class="note w" style="margin:8px 0 0">${esc(C.observacion)}</p>`);}
+function bl229Card(){const B=DATA.bl229;const tot=sum(B.filas.map(f=>f[2]));const hechas=B.filas.filter(f=>f[5]===true).length;
+  return card('c12',`<div id="bl229"></div>`+ctitle(`Barreras BL229 · ${plural(tot,'barrera','barreras')} en ${plural(B.filas.length,'frente','frentes')}`,`Matriz C20 y avance del día${sello('bl229')}`)+
+    `<div class="eqgrid" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">${B.dia2.slice(0,4).map(d=>`<div class="eq" style="cursor:default"><span>${esc(d[1])}</span><b>${nf(d[3])}</b><em>${fd(d[2])}</em></div>`).join('')}</div>`+
+    tbl([['Prioridad'],['Nombre del C20'],['Cantidad',1],['Observaciones'],['Solución'],['Estado']],
+      B.filas.map(f=>({c:[esc(f[0]),esc(f[1]),nf(f[2]),esc(f[3])||'<span class="muted">—</span>',esc(f[4]),f[5]===true?'<span class="pill p-good">Resuelto</span>':f[5]===false?'<span class="pill p-bad">Pendiente</span>':'<span class="muted">—</span>']})),
+      ['Total','',`<b>${nf(tot)}</b>`,'',`${nf(hechas)} de ${nf(B.filas.length)} resueltos`,''])+
+    (tot!==B.totalDeclarado?`<p class="note w" style="margin:10px 0 0">La hoja declara un total de ${nf(B.totalDeclarado)} barreras y las filas suman ${nf(tot)}. Se muestran las dos cifras tal como vienen.</p>`:'')+
+    `<h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:18px 0 8px">Avance del día</h3>`+
+    tbl([['N.º',1],['Ítem'],['Fecha',1],['Cantidad',1]],B.dia2.map(d=>({c:[nf(d[0]),esc(d[1]),fd(d[2]),nf(d[3])]}))));}
 function jmcCard(){const J=DATA.jmc;return card('c12',ctitle('Aeropuerto JMC – Medellín: ampliación de pasillos',`Hitos de suministro informados al comité · ligado a CC-52120 AIRPLAN Ampliación Aeropuerto JMC${sello('jmc')}`)+
   `<div class="eqgrid" style="grid-template-columns:repeat(4,1fr)">${J.hitos.map(h=>`<div class="eq" data-hito="1"><span>${h[2]?'Acción prioritaria':'Hito'}</span><b style="font-size:20px;${h[2]?'color:var(--bad)':''}">${h[1]?fd(h[1]):'Pendiente'}</b><em>${h[0]}${h[1]?` · ${relTxt(h[1])}`:''}</em></div>`).join('')}</div><p class="note" style="margin:12px 0 0">${J.nota}</p>`);}
 
@@ -1022,12 +1137,12 @@ function renderSeg(el){const B=DATA.bulevar;const bp=P.find(p=>p.cc==='CC-13109'
   const TIT_N=sum(DATA.titan.grupos.map(g=>g[2]-g[1]+1));
   const TIT_TIPOS=[...new Set(DATA.titan.grupos.map(g=>g[0]))];
   el.innerHTML=`<div class="grid">
-    ${card('c12',ctitle('Bulevar Niza · plan del sistema guiado','CC-13109 · '+ST[bp.st].l+' · % cumplimiento '+pc(bp.pct,0)+` · línea roja: corte ${CORTE_DM} · clic en una tarea${sello('bulevar')}`)+
+    ${card('c12',ctitle('Bulevar Niza · plan del sistema guiado','CC-13109 · '+ST[bp.st].l+' · % cumplimiento '+pc(bp.pct,0)+` · línea roja: corte ${CORTE_DM} · clic en una tarea${sello('bulevarplan')}`)+
       `<div class="minis" style="margin-bottom:14px"><div class="mini"><span>Tareas completadas</span><b>${done} de ${cr.length}</b></div>${bCurso?`<div class="mini"><span>${esc(bCurso[1])}</span><b>${pc(bCurso[4],0)}</b><div class="prog"><i data-w="${bCurso[4]}"></i></div></div>`:''}${bInst?`<div class="mini"><span>Inicio de ${bInst[1].toLowerCase()}</span><b>${fd(bInst[2])}</b></div>`:''}${bEnt?`<div class="mini"><span>${esc(bEnt[1])}</span><b>${fd(bEnt[3])}</b></div>`:''}</div>
       <div class="ganttw" id="seg-bulevar"><div class="gantt"><div class="grow h"><span>WBS</span><span>Tarea</span><span>Inicio</span><span>Fin</span><span>Avance</span><div class="gmonths">${months.map(m=>`<span style="left:${m[0]}%">${m[1]}</span>`).join('')}</div></div>
       ${cr.map((r,i)=>`<div class="grow lv${r[5]}" data-gt="${i}" data-key="gt-${i}" style="cursor:pointer"><span>${r[0]}</span><span class="gt">${esc(r[1])}</span><span>${fd(r[2])}</span><span>${fd(r[3])}</span><span>${pc(r[4],0)}</span><div class="gtrack"><i style="left:${X(r[2])}%;width:${Math.max(X(r[3])-X(r[2]),0.6)}%"><b data-w="${r[4]}"></b></i><span class="today" style="left:${today}%"></span></div></div>`).join('')}</div></div>`)}
-    ${card('c6',ctitle('Bulevar Niza · tareas abiertas',`ID+D · ${[['Alto','de prioridad alta'],['Crítico','crítica']].map(([k,t])=>prio(k)?`${nf(prio(k))} ${t}`:'').filter(Boolean).join(' y ')||'sin pendientes abiertos'} · clic para el detalle`)+tbl([['Descripción'],['Categoría'],['Progreso'],['Prioridad'],['Vence']],B.tareas.map((t,i)=>({c:[esc(t[1].length>90?t[1].slice(0,88)+'…':t[1]),t[2],`<span class="pill ${t[3]==='Completado'?'p-good':t[3]==='En curso'?'p-neu':'p-warn'}">${t[3]}</span>`,`<span class="pill ${t[4]==='Crítico'?'p-bad':'p-warn'}">${t[4]}</span>`,t[6]||'—'],_go:'tarea',_arg:i}))))}
-    ${card('c6',ctitle(`Bulevar Niza · plazas: ${nf(B.plazas.totales)} totales, ${nf(B.descartadas.total[B.descartadas.total.length-1])} descartadas del guiado`,`Inventario de plazas por sótano · inicial ${nf(B.plazas.inicial)} · servidumbre ${nf(B.plazas.servidumbre)}`)+
+    ${card('c6',ctitle(`Bulevar Niza · ${plural(B.tareas.filter(t=>t[3]!=='Completado').length,'tarea abierta','tareas abiertas')}`,`ID+D · ${[['Alto','de prioridad alta'],['Crítico','crítica']].map(([k,t])=>prio(k)?`${nf(prio(k))} ${t}`:'').filter(Boolean).join(' y ')||Object.entries(B.tareas.reduce((a,t)=>(a[t[3]]=(a[t[3]]||0)+1,a),{})).map(([k,v])=>`${nf(v)} ${k.toLowerCase()}`).join(' · ')} · clic para el detalle`)+tbl([['Descripción'],['Categoría'],['Progreso'],['Prioridad'],['Vence']],B.tareas.map((t,i)=>({c:[esc(t[1].length>90?t[1].slice(0,88)+'…':t[1]),t[2],`<span class="pill ${t[3]==='Completado'?'p-good':t[3]==='En curso'?'p-neu':'p-warn'}">${t[3]}</span>`,`<span class="pill ${t[4]==='Crítico'?'p-bad':'p-warn'}">${t[4]}</span>`,t[6]||'—'],_go:'tarea',_arg:i}))))}
+    ${card('c6',ctitle(`Bulevar Niza · plazas: ${nf(B.plazas.totales)} totales, ${nf(B.descartadas.total[B.descartadas.total.length-1])} descartadas del guiado`,`Inventario de plazas por sótano · inicial ${nf(B.plazas.inicial)} · servidumbre ${nf(B.plazas.servidumbre)}${sello('bulevarplan')}`)+
       tbl([['Elemento'],['Sótano 1',1],['Sótano 2',1],['Total',1]],[{c:['Plazas',nf(B.plazas.sot1),nf(B.plazas.sot2),nf(B.plazas.total)+` (${B.plazas.dif})`]},{c:['<b>Plazas totales</b>',nf(B.plazas.totSot1),nf(B.plazas.totSot2),'<b>'+nf(B.plazas.totales)+'</b>']}])+
       `<div class="minis" style="margin:12px 0"><div class="mini"><span>Inicial</span><b>${nf(B.plazas.inicial)}</b></div><div class="mini"><span>Servidumbre</span><b>${nf(B.plazas.servidumbre)}</b></div><div class="mini"><span>Inicial − totales</span><b>${nf(B.plazas.inicial-B.plazas.totales)}</b></div></div>
       <h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:8px 0">Plazas descartadas del sistema de guiado</h3>`+
@@ -1036,6 +1151,9 @@ function renderSeg(el){const B=DATA.bulevar;const bp=P.find(p=>p.cc==='CC-13109'
       tbl([['Descripción'],['Categoría'],['Progreso'],['Prioridad'],['Inicio'],['Vencimiento']],DATA.cuenca.map((t,i)=>({c:[esc(t[0]),t[1],`<span class="pill ${t[2]==='En curso'?'p-neu':'p-warn'}">${t[2]}</span>`,`<span class="pill ${t[3]==='Crítico'?'p-bad':'p-warn'}">${t[3]}</span>`,t[4]||'—',t[5]?`${t[5]}`:'—'],_go:'cuenca',_arg:i}))))}
     ${card('c7',`<div id="seg-pereira"></div>`+ctitle(`Sociedad de Mejoras de Pereira · ${plural(DATA.pereira.length,'novedad del cliente','novedades del cliente')}`,`Reporte del cliente sobre el sistema de parqueadero y el soporte · clic para leer completo${sello('pereira')}`)+`<div class="ngrid">${DATA.pereira.map((t,i)=>`<div class="ncard" data-pe="${i}" data-key="pe-${i}"><b>${t[0]}</b><p>${esc(t[1])}</p></div>`).join('')}</div>`)}
     ${card('c5',`<div id="seg-cmsabana"></div>`+ctitle('Centro Médico La Sabana · conclusiones',`Visita técnica de parqueadero${sello('cmsabana')}`)+`<ul class="bul">${DATA.cmSabana.map(c=>`<li><b style="${c[1]?'color:var(--bad)':''}">${c[0]}</b></li>`).join('')}</ul>`)}
+    ${DATA.diverplaza&&DATA.diverplaza.length?card('c12',`<div id="seg-diverplaza"></div>`+ctitle(`Diverplaza y DiverExpress · ${plural(DATA.diverplaza.length,'pendiente','pendientes')} en ${lista([...new Set(DATA.diverplaza.map(t=>t[1].toLowerCase()))])}`,`ID+D – Proyectos pendientes · CC-13714 y CC-13715 · clic para el detalle${sello('diverplaza')}`)+
+      tbl([['Descripción'],['Categoría'],['Progreso'],['Prioridad'],['Inicio'],['Vencimiento']],DATA.diverplaza.map((t,i)=>({c:[esc(t[0].length>190?t[0].slice(0,188)+'…':t[0]),t[1],prog(t[2]),prioridad(t[3]),t[4]||'—',t[5]||'—'],_go:'diver',_arg:i}))) ):''}
+    ${DATA.plazaClaro?plazaClaroCard():''}
     ${card('c12',`<div id="seg-titan"></div>`+ctitle(`Titán · viabilidad Spark2: ${plural(TIT_N,'equipo a evaluar','equipos a evaluar')}`,`RE: TITAN: Viabilidad Spark2 · ligado a CC-12428 Conversión a Spark II · clic para ver los equipos${sello('titan')}`)+
       `<div class="eqgrid">${TIT_TIPOS.map(t=>{const gs=DATA.titan.grupos.filter(g=>g[0]===t);return `<div class="eq" data-eq="${esc(t)}"><span>${esc(t)}s</span><b>${nf(sum(gs.map(g=>g[2]-g[1]+1)))}</b><em>${gs.map(g=>`${nf(g[2]-g[1]+1)} ${g[3]} (${g[4]})`).join(' · ')}</em></div>`;}).join('')}</div>
       <div style="margin-top:12px">`+tbl([['Tipo'],['N.º'],['Modelo'],['Tarjeta'],['Equipos',1]],DATA.titan.grupos.map((g,i)=>({c:[g[0],`${g[1]}–${g[2]}`,g[3],g[4],nf(g[2]-g[1]+1)],_go:'titan',_arg:i})),['Total','','','',nf(TIT_N)])+`</div>`)}
@@ -1045,7 +1163,34 @@ function renderSeg(el){const B=DATA.bulevar;const bp=P.find(p=>p.cc==='CC-13109'
   $$('[data-eq]',el).forEach(b=>act(b,()=>GO.equipos(b.dataset.eq)));
   $$('[data-go]',el).forEach(b=>act(b,()=>GO[b.dataset.go](b.dataset.arg)));}
 
-const RENDER={resumen:renderResumen,todos:renderTodos,parking:e=>renderLinea(e,'parking'),seguimiento:renderSeg,aero:e=>renderLinea(e,'aero'),peat:e=>renderLinea(e,'peat'),vehi:e=>renderLinea(e,'vehi'),compras:e=>renderLinea(e,'compras')};
+function renderProg(el){const G=DATA.programacion;
+  if(!G||!G.filas.length){el.innerHTML=`<div class="grid">${card('c12 flatnote',`<div class="pnote">${ic('info')}<span>El informe de esta semana no trae el diagrama de programación.</span></div>`)}</div>`;return;}
+  const con=G.filas.filter(f=>f[1]&&f[2]), sin=G.filas.filter(f=>!(f[1]&&f[2]));
+  const t0=dt(G.desde).getTime(), t1=dt(G.hasta).getTime(), span=(t1-t0)||1;
+  const X=d=>(dt(d).getTime()-t0)/span*100, hoy=(CORTE.getTime()-t0)/span*100;
+  const meses=[];{const d=new Date(t0);d.setDate(1);d.setMonth(d.getMonth()+1);
+    while(d.getTime()<=t1){const x=(d.getTime()-t0)/span*100;if(x>=0&&x<=100)meses.push([x,MES[d.getMonth()]+(d.getMonth()===0?` ${d.getFullYear()}`:'')]);d.setMonth(d.getMonth()+1);}}
+  const dur=f=>Math.round((dt(f[2])-dt(f[1]))/864e5)+1;
+  el.innerHTML=`<div class="grid">
+    <div class="k5">
+      ${kpi('prog','all','hero','calendar','Proyectos programados',G.filas.length,`Del ${fd(G.desde)} al ${fd(G.hasta)}`)}
+      ${kpi('prog','con','st-at','check','Con fechas',con.length,`${pc(G.filas.length?con.length/G.filas.length*100:0)} del plan`)}
+      ${kpi('prog','sin','st-riesgo','clock','Sin fechas',sin.length,sin.length?'El export no las mostró':'Todas fechadas')}
+      ${kpi('prog','corto','st-cli','user','Más corto',con.length?Math.min(...con.map(dur)):0,'días de ejecución')}
+      ${kpi('prog','largo','st-inc','alert','Más largo',con.length?Math.max(...con.map(dur)):0,'días de ejecución')}
+    </div>
+    ${card('c12',ctitle(`Programación de ${plural(G.filas.length,'proyecto','proyectos')}`,`Periodo general del ${fd(G.desde)} al ${fd(G.hasta)} · línea roja: corte ${CORTE_DM} · clic en una fila${sello('programacion')}`)+
+      `<div class="ganttw"><div class="gantt"><div class="grow h" style="grid-template-columns:minmax(260px,1.6fr) 96px 96px 64px 3fr"><span>Proyecto</span><span>Inicio</span><span>Fin</span><span>Días</span><div class="gmonths">${meses.map(m=>`<span style="left:${m[0]}%">${m[1]}</span>`).join('')}</div></div>
+      ${G.filas.map((f,i)=>`<div class="grow" style="grid-template-columns:minmax(260px,1.6fr) 96px 96px 64px 3fr;cursor:pointer" data-pg2="${i}"><span class="gt">${esc(f[0])}</span><span>${fd(f[1])}</span><span>${fd(f[2])}</span><span>${f[1]&&f[2]?nf(dur(f)):'—'}</span><div class="gtrack">${f[1]&&f[2]?`<i style="left:${X(f[1])}%;width:${Math.max(X(f[2])-X(f[1]),0.6)}%"><b data-w="100"></b></i>`:''}<span class="today" style="left:${Math.max(0,Math.min(100,hoy))}%"></span></div></div>`).join('')}</div></div>`+
+      (sin.length?`<p class="note w" style="margin:12px 0 0">${plural(sin.length,'proyecto aparece','proyectos aparecen')} en el diagrama sin fechas visibles: el export recortó esa parte de la captura. ${lista(sin.map(f=>f[0]))}.</p>`:''))}
+  </div>`;
+  $$('[data-pg2]',el).forEach(b=>act(b,()=>{const f=G.filas[+b.dataset.pg2];const pr=P.find(x=>f[0].startsWith(x.cc)||f[0].includes(x.cc));
+    openInspector({kind:'Programación de proyectos',title:f[0],sub:`Periodo general del ${fd(G.desde)} al ${fd(G.hasta)}`,key:'pg2-'+b.dataset.pg2,
+      minis:[['Inicio',fd(f[1])],['Fin',fd(f[2])],['Duración',f[1]&&f[2]?plural(dur(f),'día','días'):'—']],
+      sections:[{t:'Programación completa',h:tbl([['Proyecto'],['Inicio',1],['Fin',1],['Días',1]],G.filas.map(x=>({c:[esc(x[0]),fd(x[1]),fd(x[2]),x[1]&&x[2]?nf(dur(x)):'—']})))},
+        pr?{h:`<button class="chip sm" data-go="proyecto" data-arg="${pr.i}">Ver el proyecto en el portafolio</button>`}:{h:''}]});}));
+  wireGo(el);}
+const RENDER={resumen:renderResumen,programacion:renderProg,todos:renderTodos,parking:e=>renderLinea(e,'parking'),seguimiento:renderSeg,aero:e=>renderLinea(e,'aero'),peat:e=>renderLinea(e,'peat'),vehi:e=>renderLinea(e,'vehi'),compras:e=>renderLinea(e,'compras')};
 
 /* =====================================================================
    6. NAVEGACIÓN, BÚSQUEDA, TEMA, ALERTAS
@@ -1064,6 +1209,10 @@ function searchIndex(){const I=[];P.forEach(p=>I.push({t:p.cc,l:p.n+' · '+linN(
   DATA.cuenca.forEach((t,i)=>I.push({t:'Cuenca',l:t[0],f:()=>GO.cuenca(i)}));
   DATA.pereira.forEach((t,i)=>I.push({t:'Pereira',l:t[0],f:()=>GO.pereira(i)}));
   DATA.bulevar.tareas.forEach((t,i)=>I.push({t:'Bulevar',l:t[1],f:()=>GO.tarea(i)}));
+  (DATA.diverplaza||[]).forEach((t,i)=>I.push({t:'Diverplaza',l:t[0],f:()=>GO.diver(i)}));
+  (DATA.programacion?DATA.programacion.filas:[]).forEach(f=>I.push({t:'Programación',l:f[0],f:()=>go('programacion')}));
+  if(DATA.plazaClaro)I.push({t:'Seguimiento',l:'Contrato Plaza Claro · matriz de entregables',f:()=>GO.seg('plazaclaro')});
+  if(DATA.bl229)I.push({t:'Acceso vehicular',l:'Barreras BL229 · matriz C20',f:()=>go('vehi')});
   DATA.bulevar.cronograma.forEach((t,i)=>I.push({t:'Bulevar',l:t[0]+' '+t[1],f:()=>GO.gtask(i)}));
   I.push({t:'Seguimiento',l:'Centro Médico La Sabana',f:()=>GO.seg('cmsabana')},{t:'Seguimiento',l:'Titán · viabilidad Spark2',f:()=>GO.seg('titan')});
   VIEWS.forEach(v=>I.push({t:'Vista',l:v.l,f:()=>go(v.id)}));return I;}

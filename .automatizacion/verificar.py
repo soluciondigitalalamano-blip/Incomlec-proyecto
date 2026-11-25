@@ -16,7 +16,8 @@ RAIZ = pathlib.Path(__file__).resolve().parent.parent
 HTML = RAIZ / 'index.html'
 ESTADOS = {'at', 'riesgo', 'cli', 'inc', 'sin'}
 LINEAS = {'parking', 'aero', 'peat', 'vehi', 'compras'}
-SECCIONES = {'resumen','proyectos','bulevar','cuenca','pereira','cmsabana','titan','jmc'}
+SECCIONES = {'resumen','proyectos','bulevar','cuenca','pereira','cmsabana','titan','jmc',
+              'bulevarplan','diverplaza','plazaclaro','programacion','bl229'}
 ISO = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 
 
@@ -141,6 +142,47 @@ print('  INFO  filas por linea: ' + ' · '.join(f"{k} {v}" for k, v in sorted(po
 print('        Cuadralo a mano contra la tarjeta TOTAL de cada pagina del insumo:')
 print('        si falta una fila, es una captura de scroll que no se leyo.')
 
+tablas = {}
+for p_ in PR:
+    tablas[p_[3]] = tablas.get(p_[3], 0) + 1
+difs = [f"{k}: resumen {A.get(k)} vs tablas {tablas.get(k, 0)}"
+        for k in ('at', 'riesgo', 'cli', 'inc') if A.get(k) != tablas.get(k, 0)]
+if difs:
+    avisa('el resumen ejecutivo no coincide con la suma de las tablas · ' + ' · '.join(difs) +
+          ' · si se publica asi, rellena DATA.discrepancia para que la pagina lo diga')
+    if not D.get('discrepancia'):
+        chk(False, '', 'hay descuadre entre el resumen y las tablas y DATA.discrepancia esta vacio: '
+                       'la pagina mostraria dos cifras contradictorias sin explicarlo')
+    else:
+        print('  OK    DATA.discrepancia explica el descuadre en la pagina')
+else:
+    print(f"  OK    el resumen coincide con las tablas en los cuatro estados")
+
+# --- secciones nuevas, solo si vienen ---
+if D.get('plazaClaro'):
+    C = D['plazaClaro']
+    malos = [r[0] for r in C['categorias'] if sum(r[2:]) != r[1]]
+    chk(not malos, f"plazaClaro: las {len(C['categorias'])} categorias cierran en su total",
+        f"plazaClaro: el desglose no suma el total en {', '.join(malos)}")
+if D.get('programacion'):
+    G = D['programacion']
+    malos = [f[0] for f in G['filas'] if f[1] and f[2] and d(f[1]) > d(f[2])]
+    chk(not malos, f"programacion: {len(G['filas'])} filas con fin >= inicio",
+        f"programacion: fin anterior al inicio en {', '.join(malos)}")
+    fuera = [f[0] for f in G['filas'] if f[1] and (d(f[1]) < d(G['desde']) or d(f[2]) > d(G['hasta']))]
+    if fuera: avisa(f"programacion: filas fuera del periodo general declarado: {', '.join(fuera)}")
+    sinf = [f[0] for f in G['filas'] if not (f[1] and f[2])]
+    if sinf: avisa(f"programacion: sin fechas visibles en el export: {', '.join(sinf)}")
+if D.get('bl229'):
+    Bl = D['bl229']
+    t = sum(f[2] for f in Bl['filas'])
+    if t != Bl.get('totalDeclarado'):
+        avisa(f"bl229: las filas suman {t} barreras y la hoja declara {Bl.get('totalDeclarado')} · la pagina muestra las dos")
+    else:
+        print(f"  OK    bl229: las filas suman las {t} barreras declaradas")
+if D.get('diverplaza'):
+    print(f"  OK    diverplaza: {len(D['diverplaza'])} pendientes")
+
 B_ = D['bulevar']; pz = B_['plazas']
 chk(pz['sot1'] + pz['sot2'] == pz['total'],
     f"plazas: {pz['sot1']}+{pz['sot2']} = {pz['total']}",
@@ -220,8 +262,19 @@ else:
     else:     print('  OK    ningun proyecto retrocedio en % de cumplimiento')
 
     # Las secciones marcadas como desfasadas no deben haber cambiado.
-    LLAVE = {'bulevar':'bulevar','cuenca':'cuenca','pereira':'pereira','cmsabana':'cmSabana','titan':'titan','jmc':'jmc'}
-    for sec, f in cortes.items():
+    LLAVE = {'cuenca':'cuenca','pereira':'pereira','cmsabana':'cmSabana','titan':'titan','jmc':'jmc'}
+    # `bulevar` son las tareas; `bulevarplan`, las plazas y el cronograma.
+    # Pueden venir de cortes distintos, asi que se comparan por separado.
+    SUB = {'bulevar': ('tareas',), 'bulevarplan': ('plazas', 'descartadas', 'cronograma')}
+    for sec, f in sorted(cortes.items()):
+        if sec in SUB:
+            viejo_b, nuevo_b = P.get('bulevar', {}), D.get('bulevar', {})
+            movidas = [x for x in SUB[sec] if x in viejo_b and viejo_b.get(x) != nuevo_b.get(x)]
+            if movidas:
+                chk(False, '', f"cortes.{sec} dice que eso vino desfasado ({f}) pero cambio: {', '.join(movidas)}")
+            else:
+                print(f"  OK    cortes.{sec}: {', '.join(SUB[sec])} conserva(n) los valores publicados")
+            continue
         k = LLAVE.get(sec)
         if k and k in P and D.get(k) != P.get(k):
             chk(False, '', f"cortes.{sec} dice que esa pagina vino desfasada ({f}) pero sus datos CAMBIARON · no se transcribe una seccion desfasada")

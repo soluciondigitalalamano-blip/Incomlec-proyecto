@@ -14,17 +14,19 @@ una hora que quede en el futuro.
 ## Paso 0 · Salidas tempranas
 
 Busca en Gmail un correo **del dominio `incomelec.com`**, con **«informe
-proyectos» en el asunto** y un **PDF adjunto**.
+proyectos» en el asunto** y un **adjunto de PowerPoint**.
 
 Consulta sugerida: `from:incomelec.com subject:(informe proyectos) has:attachment newer_than:10d`
 
-El adjunto se llama `<AAMMDD> INFORME COMITE DE PROYECTOS<...>.pdf`
-(ej. `261014 INFORME COMITÉ DE PROYECTOS V2.pdf`).
+⚠ **El insumo es un `.pptx`, no un PDF.** El adjunto se llama
+`<DDMMAAAA>-_INFORME_COMIT__DE_PROYECTOS_V<n>.pptx`, por ejemplo
+`18112026-_INFORME_COMIT__DE_PROYECTOS_V2.pptx` = corte del **18 de
+noviembre de 2026**. La fecha va en **DDMMAAAA**, igual que en Soporte.
 
-⚠ **Ojo: aquí la fecha va en AAMMDD, no en DDMMAAAA como en Soporte.**
-`261014` es el **14 de octubre de 2026**. Los separadores, los acentos y el
-sufijo de versión varían; no descartes un PDF por eso. Lo que importa son
-los seis dígitos iniciales.
+Los separadores, los acentos y el sufijo de versión varían; no descartes un
+adjunto por eso. Lo que importa son los ocho dígitos iniciales — y aun así,
+**la fecha que manda es la de la tarjeta «Actualizado: DD/MM/AAAA» del pie
+de la página 1**, no la del nombre. Si no coinciden, no publiques y avisa.
 
 ### Qué es «ya está publicado»
 
@@ -56,28 +58,36 @@ es el desplegado.** Léelo con WebFetch:
 - **Su corte es anterior al desplegado** → no publiques y avisa. Nunca
   retrocedas el corte.
 
-## Paso 1 · Descargar y renderizar
+## Paso 1 · Descargar y extraer las imágenes
 
-Baja el adjunto a una carpeta nueva y vacía. Renderiza todas las páginas:
+Baja el adjunto a una carpeta nueva y vacía.
 
-```
-pdftoppm -png -r 110 informe.pdf pag
-```
+Las diapositivas son capturas pegadas: no tienen texto extraíble, y
+convertirlas con LibreOffice **recorta las tablas y pierde filas**. Extrae
+las imágenes incrustadas, que vienen a resolución nativa, y léelas como
+imágenes. El procedimiento exacto está en `MAPA_PDF_A_DATA.md`.
 
-Lee cada página **como imagen**. El texto extraído de un PDF de Power BI
-sale desordenado y mezcla columnas: no transcribas desde ahí.
+⚠ **Una diapositiva puede traer varias imágenes, y hacen falta todas**: las
+tablas de Power BI tienen scroll y el export añade capturas con las filas
+que no cabían. Leer solo la primera imagen hace perder proyectos en
+silencio. Cuadra siempre las filas que transcribas contra las tarjetas
+laterales de total y de reparto por estado de esa misma página.
 
 ## Paso 2 · Validar que el PDF viene completo  ⚠️ OBLIGATORIO
 
-Lee en **cada página** su tarjeta de fecha (la de «Max Fecha Datos», el
-segmentador de periodo, o el rótulo de corte que traiga) y compárala con
-el corte del nombre del archivo.
+Lee en **cada página** su tarjeta de fecha (el «Actualizado: DD/MM/AAAA»
+del pie, el segmentador de periodo, o el rótulo de corte que traiga) y
+compárala con el corte.
 
 Esto no es teórico: en Soporte, el 18-nov-2026 una página vino congelada en
 la fecha de la semana anterior, con cifras idénticas, mientras el resto del
 PDF sí traía el corte nuevo.
 
-Si alguna página no corresponde al corte:
+Lo mismo vale para una página que **no venga**: el export del 18-nov-2026
+no trajo Pereira, Centro Médico La Sabana, Titán ni JMC, que sí están en
+el tablero. Una sección que falta se trata igual que una desfasada.
+
+Si alguna página no corresponde al corte, o no aparece:
 
 - **no transcribas esa sección**: deja publicados los valores anteriores;
 - **rotúlala con su propia fecha** en `DATA.cortes` (ver abajo). No la

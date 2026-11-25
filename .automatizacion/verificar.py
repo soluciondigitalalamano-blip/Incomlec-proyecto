@@ -81,7 +81,7 @@ if ISO.match(D.get('corte','')) and ISO.match(D.get('ant','')):
         f"el corte {D['corte']} NO es posterior al anterior {D['ant']}")
     hoy = datetime.date.today()
     chk(d(D['corte']) <= hoy, f"el corte no esta en el futuro (hoy {hoy})",
-        f"el corte {D['corte']} esta en el FUTURO (hoy {hoy}) · casi seguro es AAMMDD mal leido")
+        f"el corte {D['corte']} esta en el FUTURO (hoy {hoy}) · casi seguro es la fecha del nombre mal leida (va en DDMMAAAA)")
 cortes = D.get('cortes', {})
 desc = set(cortes) - SECCIONES
 chk(not desc, f"claves de DATA.cortes validas ({len(cortes)} seccion(es) desfasada(s))",
@@ -132,6 +132,14 @@ if len(PR) != A['total']:
           f"({A['total']-len(PR)} sin desglosar) · normal, pero confirmalo contra el PDF")
 else:
     print(f"  OK    las tablas traen las {len(PR)} filas del resumen")
+
+porlinea = {}
+for p_ in PR:
+    porlinea[p_[0]] = porlinea.get(p_[0], 0) + 1
+print('  INFO  filas por linea: ' + ' · '.join(f"{k} {v}" for k, v in sorted(porlinea.items())) +
+      f" · total {len(PR)}")
+print('        Cuadralo a mano contra la tarjeta TOTAL de cada pagina del insumo:')
+print('        si falta una fila, es una captura de scroll que no se leyo.')
 
 B_ = D['bulevar']; pz = B_['plazas']
 chk(pz['sot1'] + pz['sot2'] == pz['total'],

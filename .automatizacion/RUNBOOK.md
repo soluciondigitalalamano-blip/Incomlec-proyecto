@@ -26,12 +26,34 @@ El adjunto se llama `<AAMMDD> INFORME COMITE DE PROYECTOS<...>.pdf`
 sufijo de versión varían; no descartes un PDF por eso. Lo que importa son
 los seis dígitos iniciales.
 
-- **No llegó** → termina en silencio. No avises.
+### Qué es «ya está publicado»
+
+Hay **dos** cortes que mirar, y no son el mismo:
+
+| Dónde | Qué significa |
+|---|---|
+| `DATA.corte` en `index.html` del repo | lo que está **transcrito y commiteado** |
+| `corte.txt` **del sitio desplegado** | lo que el cliente **ve de verdad** |
+
+Pueden separarse: si el push sale pero Cloudflare no despliega, el repo va
+por delante del sitio. **El que manda para decidir si hay trabajo pendiente
+es el desplegado.** Léelo con WebFetch:
+`https://incomlec-proyecto.pages.dev/corte.txt?v=<algo distinto cada vez>`
+
+### Las salidas
+
+- **No llegó el correo** → termina en silencio. No avises.
   **Excepción**: en la última franja de la semana (viernes 16:52), si no
   llegó nada en ninguna franja, avisa que no hubo insumo.
-- **Llegó, pero su corte ya está publicado** en `DATA.corte` de
-  `index.html` → termina en silencio.
-- **Su corte es anterior al publicado** → no publiques y avisa. Nunca
+- **Llegó y su corte ya está en el `corte.txt` desplegado** → termina en
+  silencio: ya se publicó y ya se avisó.
+- **Llegó, el repo ya tiene ese corte transcrito pero el desplegado es
+  anterior** → **no vuelvas a transcribir**. La transcripción de otra
+  franja se quedó a medias: el push salió y el despliegue no. Salta
+  directo al **Paso 5** (esperar y verificar el despliegue) y sigue desde
+  ahí con el correo y la Bitácora. Si el despliegue sigue sin llegar,
+  avisa: probablemente la conexión Git del proyecto en Cloudflare se cayó.
+- **Su corte es anterior al desplegado** → no publiques y avisa. Nunca
   retrocedas el corte.
 
 ## Paso 1 · Descargar y renderizar

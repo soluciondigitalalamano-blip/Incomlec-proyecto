@@ -9,6 +9,7 @@ Proyectos de INCOMELEC.
 |---|---|
 | `index.html` | El informe completo (HTML, CSS y JS en un solo archivo) |
 | `.automatizacion/` | Runbook, mapa del PDF, verificación y plantilla de correo |
+| `corte.txt` | El corte publicado, en texto plano. Lo escribe `verificar.py`; no se edita a mano |
 | `.nojekyll` | Evita que GitHub Pages procese el sitio con Jekyll |
 
 ## Cómo actualizar
@@ -22,7 +23,11 @@ A mano, el procedimiento completo está en
 
 1. Editar **solo** el bloque `const DATA = { … }` de `index.html`.
 2. `python3 .automatizacion/verificar.py` — si sale con código 1, no se publica.
+   De paso reescribe `corte.txt`; va en el mismo commit.
 3. Commit y push a `main`; Cloudflare Pages despliega en uno a cuatro minutos.
+4. Comprobar `https://incomlec-proyecto.pages.dev/corte.txt` con WebFetch
+   (`curl` no sale del entorno del agente, y las fechas de la página las
+   pinta el JavaScript, así que no están en el HTML servido).
 
 > **No escribas fechas ni totales a mano.** El encabezado, el pie, el
 > filtro de periodo, los títulos de las tarjetas, las alertas y los

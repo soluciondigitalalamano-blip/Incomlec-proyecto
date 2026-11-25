@@ -143,17 +143,24 @@ vuelve a consultar con un parámetro distinto en la URL (`?v=<algo>`) para
 no leer la copia en caché; **no des por fallido el despliegue antes de
 cinco minutos**.
 
-⚠ **Los rótulos de fecha los pinta el JavaScript al abrir la página, así
-que no aparecen en el HTML servido.** No compruebes el despliegue
-buscando «14 oct 2026» en el fuente: no va a estar nunca. Comprueba el
-propio dato, que sí viaja en el HTML:
+⚠ **Cómo NO comprobarlo.** Los rótulos de fecha los pinta el JavaScript
+al abrir la página, así que no están en el HTML servido: buscar
+«14 oct 2026» en el fuente no encuentra nada nunca. Y el bloque `DATA`
+tampoco sirve, porque las herramientas de lectura web descartan los
+`<script>`. Además, **desde el entorno del agente `curl` no llega a
+`pages.dev`** (el proxy responde 403): solo funciona WebFetch.
+
+Por eso el corte se publica también en texto plano, en `corte.txt`, que
+escribe `verificar.py` a partir de `DATA.corte` (no se edita a mano).
+Comprueba con **WebFetch**:
 
 ```
-curl -s 'https://incomlec-proyecto.pages.dev/?v='$(date +%s) | grep -o "corte:'[0-9-]*'"
+https://incomlec-proyecto.pages.dev/corte.txt?v=<algo distinto cada vez>
 ```
 
-Tiene que devolver el corte nuevo. **Si todavía sirve el corte anterior,
-no envíes el correo**: avisa que el despliegue no llegó.
+Tiene que devolver el corte nuevo en ISO. **Si todavía devuelve el corte
+anterior, o da 404, no envíes el correo**: avisa que el despliegue no
+llegó.
 
 ## Paso 6 · Correo
 

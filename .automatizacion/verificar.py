@@ -220,6 +220,18 @@ else:
         elif k:
             print(f"  OK    cortes.{sec}: la seccion conserva los valores publicados")
 
+# corte.txt: el unico sitio donde el corte viaja en texto plano servible.
+# Lo escribe el script, no la mano, para que no pueda discrepar de DATA.corte.
+CORTE_TXT_FILE = RAIZ / 'corte.txt'
+if not fallos and ISO.match(D.get('corte', '')):
+    previo = CORTE_TXT_FILE.read_text().strip() if CORTE_TXT_FILE.exists() else None
+    CORTE_TXT_FILE.write_text(D['corte'] + '\n')
+    print('\n── corte.txt ──')
+    print(f"  OK    corte.txt escrito con {D['corte']}" +
+          (f" (antes {previo})" if previo and previo != D['corte'] else ''))
+    print('        Acuerdate de incluirlo en el commit: es lo que se consulta')
+    print('        para dar el despliegue por bueno en el Paso 5.')
+
 print('\n── Resultado ──')
 if fallos:
     print(f"  {len(fallos)} FALLO(S). No publiques."); sys.exit(1)
